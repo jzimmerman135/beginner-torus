@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.ejs": "html",
-        "*.html": "html",
-        "*.ftml": "html",
-        "curses.h": "c"
-    },
-    "C_Cpp.errorSquiggles": "Disabled"
-}
