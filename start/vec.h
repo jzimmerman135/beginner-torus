@@ -29,6 +29,7 @@ struct vec2 {
 
 /* new struct vec2 */
 struct vec2 vec2(float x, float y);
+struct vec2 scale2(struct vec2 a, float s);
 
 struct vec3 {
     float x;
@@ -58,8 +59,8 @@ float dot3(struct vec3 a, struct vec3 b);
 struct vec3 cross3(struct vec3 a, struct vec3 b);
 
 /* rotate struct vec3 around axis by t radians */
-struct vec3 rotateX(float3 a, float t);
-struct vec3 rotateY(float3 a, float t);
-struct vec3 rotateZ(float3 a, float t);
+struct vec3 rotateX(struct vec3 a, float t);
+struct vec3 rotateY(struct vec3 a, float t);
+struct vec3 rotateZ(struct vec3 a, float t);
 
 #endif

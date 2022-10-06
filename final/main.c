@@ -6,8 +6,8 @@
 #include "vec.h"
 
 #define MAX_TIME 20.0
-#define WINDOW_W 140
-#define WINDOW_H 60
+#define MAX_WINDOW_W 300
+#define MAX_WINDOW_H 120
 #define WINDOW_STRETCH_FACTOR 2. 
 
 #define MAX_STEPS 100
@@ -19,8 +19,9 @@
 #define LOOKAT_POSITION 0, 0, 0
 #define ZOOM 1.0
 
-char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
+char  colors[] = {'`', '%', '#', '@', '*', '+', '=', ':', '-', '.', ' '};
 float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+const int N_LEVELS = sizeof(colors) / sizeof(*colors); 
 
 /* shapes */
 float cube_SDF(float3 p, float r);
@@ -46,8 +47,8 @@ int main()
     clock_t time_start = clock();
     float time_elapsed; /* in seconds */
 
-    int w = min(300, COLS);
-    int h = min(120, LINES);
+    int w = min(MAX_WINDOW_W, COLS);
+    int h = min(MAX_WINDOW_H, LINES);
     int frames = 0;
 
     do { 
@@ -57,9 +58,9 @@ int main()
         frames++;
 } while (time_elapsed < MAX_TIME);    
 
-endwin();       /* return to command line */
-printf("Animation complete\nFramerate %.0f fps\n", frames / time_elapsed);
-return 0;
+    endwin();       /* return to command line */
+    printf("Animation complete\nFramerate %.0f fps\n", frames / time_elapsed);
+    return 0;
 }
 
 /*
@@ -69,27 +70,27 @@ return 0;
 */
 void draw_scene(int w, int h, float t)
 {
-float aspect_ratio = (float)w / ((float)h * WINDOW_STRETCH_FACTOR);
-for (int i = 0; i < w; i++) {
-    for (int j = 0; j < h; j++) {
-        /* i / w, j / h -> normalized to range (-0.5, 0.5) */
-        float x = (float)i / (float)w - 0.5;
-        float y = (float)j / (float)h - 0.5;
+    float aspect_ratio = (float)w / ((float)h * WINDOW_STRETCH_FACTOR);
+    for (int i = 0; i < w; i++) {
+        for (int j = 0; j < h; j++) {
+            /* i / w, j / h -> normalized to range (-0.5, 0.5) */
+            float x = (float)i / (float)w - 0.5;
+            float y = (float)j / (float)h - 0.5;
 
-        /* correct for aspect ratio */
-        x *= aspect_ratio;
+            /* correct for aspect ratio */
+            x *= aspect_ratio;
 
-        /* get scene brightness */
-        float b = coordinate_to_brightness(x, y, t);
+            /* get scene brightness */
+            float b = coordinate_to_brightness(x, y, t);
 
-        /* get character to render at pixel */
-        char a = brightness_to_ascii(b);
-        
-        /* draw to screen */
-        move(j, i);
-        addch(a);
+            /* get character to render at pixel */
+            char a = brightness_to_ascii(b);
+            
+            /* draw to screen */
+            move(j, i);
+            addch(a);
+        }
     }
-}
 }
 
 /*
@@ -98,15 +99,9 @@ for (int i = 0; i < w; i++) {
 */
 char brightness_to_ascii(float b)
 {
-int n_levels = sizeof(colors) / sizeof(*colors); 
-
-if (b > levels[n_levels - 1])
-    return colors[n_levels - 1];
-
-int i = 0;
-while (b > levels[i] && i < n_levels)
-        i++;
-
+    int i = 0;
+    while (b > levels[i] && i < N_LEVELS)
+            i++;
     return colors[i]; 
 }
 
@@ -144,8 +139,10 @@ float coordinate_to_brightness(float x, float y, float t)
  */
 float3 ray_dir(float2 uv, float3 p, float3 l, float z)
 {
+    uv.x = -uv.x;
+    uv.y = -uv.y;
     float3 f = normalize3(subtract3(l, p));
-    float3 r = normalize3(cross3(vec3(0, -1, 0), f));
+    float3 r = normalize3(cross3(vec3(0, 1, 0), f));
     float3 u = cross3(f, r);
     float3 c = scale3(f, z);
     r = scale3(r, uv.x);
@@ -193,7 +190,7 @@ float get_distance(float3 p, float t)
     p = rotateY(p, t * 3.);
     p = rotateZ(p, t);
     float d_donut = torus_SDF(p, 2.0, 0.75);
-    float d_cube = cube_SDF(p, 1.0) - 0.5;
+    float d_cube = cube_SDF(p, 1.25) - 0.25;
     float d = lerp(d_donut, d_cube, (tanh(t - 10.0) - tanh(t-15.0)) * .5);
     return d;
 }
@@ -229,7 +226,6 @@ float get_light(float3 cp, float3 lo, float t)
     /* get direction from light source to contact point */
     float3 ld = {lo.x - cp.x, lo.y - cp.y, lo.z - cp.z};
     ld = normalize3(ld);
-
     /* get normal of surface */ 
     float3 cn = get_normal(cp, t); 
     

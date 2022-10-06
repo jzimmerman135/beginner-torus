@@ -26,6 +26,12 @@ float length2f(float x, float y)
     return sqrt(x * x + y * y);
 }
 
+struct vec2 scale2(struct vec2 a, float s)
+{
+    struct vec2 v = {a.x * s, a.y * s};
+    return v;
+}
+
 /*******************************************************************************
                                VEC3 FUNCTIONS 
  ******************************************************************************/

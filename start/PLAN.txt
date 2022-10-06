@@ -1,0 +1,35 @@
+Order of operations:
+--------------------
+
+
+Implement brightness_to_ascii
+-- printf a variety of results
+
+Implement draw_scene and dummy coordinate to brightness
+-- use curses
+-- draw a variety of brightnesses to the entire screen
+-- draw a circle
+
+Implement main timer loop
+-- make the circle change size
+
+Explain raymarching algorithm
+-- ray origin
+-- ray direction
+-- distance estimator
+-- normals
+-- light direction
+
+Implement Distance Estimator
+-- explain signed distance field
+-- basically give function
+
+Implement Raymarching loop
+-- draw sphere
+
+Implement get_normal (5 minutes)
+
+Implement get_light (10 minutes)
+-- move light source
+
+Add movement! (30 minutes)
