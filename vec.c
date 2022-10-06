@@ -3,11 +3,12 @@
 
 float clamp(float a, float b, float c)
 {
-    if (b < a)
-        return b;
-    else if (a > c)
-        return c;
-    return a;
+    return max(b, min(a, c));
+}
+
+float lerp(float a, float b, float t)
+{
+    return a + (b - a) * clamp(t, 0.0, 1.0);
 }
 
 /*******************************************************************************
@@ -67,4 +68,44 @@ struct vec3 scale3(struct vec3 a, float s)
 float dot3(struct vec3 a, struct vec3 b)
 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+struct vec3 cross3(struct vec3 a, struct vec3 b)
+{
+    struct vec3 v = {
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x
+    };
+    return v;
+}
+
+struct vec3 rotateY(float3 a, float t)
+{
+    struct vec3 v = {
+        a.x * cos(t) - a.z * sin(t),
+        a.y,
+        a.z * cos(t) + a.x * sin(t)
+    };
+    return v;
+}
+
+struct vec3 rotateX(float3 a, float t)
+{
+    struct vec3 v = {
+        a.x,
+        a.z * cos(t) + a.y * sin(t),
+        a.y * cos(t) - a.z * sin(t)
+    };
+    return v;
+}
+
+struct vec3 rotateZ(float3 a, float t)
+{
+    struct vec3 v = {
+        a.x * cos(t) + a.y * sin(t),
+        a.y * cos(t) - a.x * sin(t),
+        a.z
+    };
+    return v;
 }

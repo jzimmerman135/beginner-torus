@@ -5,21 +5,30 @@
 #include <math.h>
 #include "vec.h"
 
-#define MAX_TIME 5.0
-#define WINDOW_W 120
-#define WINDOW_H 50
+#define MAX_TIME 20.0
+#define WINDOW_W 140
+#define WINDOW_H 60
 #define WINDOW_STRETCH_FACTOR 2. 
 
-#define MAX_STEPS 200
-#define MAX_DIST 50.0
-#define SURF_DIST 0.001
+#define MAX_STEPS 100
+#define MAX_DIST 10.0
+#define SURF_DIST 0.01
+
+#define RAY_ORIGIN 0, 5, -5
+#define LIGHT_ORIGIN -5.0, 10, 2.0
+#define LOOKAT_POSITION 0, 0, 0
+#define ZOOM 1.0
+
+/* shapes */
+float cube_SDF(float3 p, float r);
+float torus_SDF(float3 p, float r1, float r2);
 
 /* rendering functions */
-float raymarch(struct vec3 ro, struct vec3 rd);
-float get_distance(struct vec3 p);
-struct vec3 get_normal(struct vec3 p);
-float get_light(struct vec3 cp, struct vec3 lo);
-float torus_SDF(struct vec3 p, struct vec2 t);
+float3 ray_dir(float2 uv, float3 p, float3 l, float z);
+float raymarch(float3 ro, float3 rd, float t);
+float get_distance(float3 p, float t);
+float3 get_normal(float3 p, float t);
+float get_light(float3 cp, float3 lo, float t);
 
 /* drawing functions */
 float coordinate_to_brightness(float x, float y, float t);
@@ -32,18 +41,21 @@ int main()
     curs_set(0);    /* hide cursor      */
 
     clock_t time_start = clock();
-    float time_elapsed;
+    float time_elapsed; /* in seconds */
+
+    int w = min(300, COLS);
+    int h = min(120, LINES);
+    int frames = 0;
+
     do { 
-
-        time_elapsed = (float)(clock() - time_start) / CLOCKS_PER_SEC;
-
-        draw_scene(WINDOW_W, WINDOW_H, time_elapsed);
-
+        time_elapsed = (float)(clock() - time_start) / CLOCKS_PER_SEC;     
+        draw_scene(w, h, time_elapsed);
         refresh();  /* output to screen */
-
+        frames++;
     } while (time_elapsed < MAX_TIME);    
 
-    endwin();       /* return to terminal */
+    endwin();       /* return to command line */
+    printf("Animation complete\nFramerate %.0f fps\n", frames / time_elapsed);
     return 0;
 }
 
@@ -54,15 +66,23 @@ int main()
  */
 void draw_scene(int w, int h, float t)
 {
+    float aspect_ratio = (float)w / ((float)h * WINDOW_STRETCH_FACTOR);
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
+            /* i / w, j / h -> normalized to range (-0.5, 0.5) */
             float x = (float)i / (float)w - 0.5;
             float y = (float)j / (float)h - 0.5;
-            x *= (float)w / ((float)h * (float)WINDOW_STRETCH_FACTOR);
+    
+            /* correct for aspect ratio */
+            x *= aspect_ratio;
 
+            /* get scene brightness */
             float b = coordinate_to_brightness(x, y, t);
+
+            /* get character to render at pixel */
             char a = brightness_to_ascii(b);
             
+            /* draw to screen */
             move(j, i);
             addch(a);
         }
@@ -71,21 +91,22 @@ void draw_scene(int w, int h, float t)
 
 /*
  * b = brightness value
+ * returns corresponding character
  */
 char brightness_to_ascii(float b)
 {
-    char  colors[] = {' ', '.', ':', '-', '=', '+', '*', '#', '%', '@'};
-    float levels[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+    char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
+    float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
     int n_levels = sizeof(colors) / sizeof(*colors); 
     
     if (b > levels[n_levels - 1])
         return colors[n_levels - 1];
-    
+
     int i = 0;
     while (b > levels[i] && i < n_levels)
         i++;
 
-    return colors[n_levels - i - 1]; 
+    return colors[i]; 
 }
 
 /*
@@ -95,52 +116,84 @@ char brightness_to_ascii(float b)
  */
 float coordinate_to_brightness(float x, float y, float t)
 {
-    (void)t;
-    struct vec3 ro = {0, 2.0, 0};
-    struct vec3 rd = normalize3(vec3(x, y, 1));
-    
-    float d = raymarch(ro, rd);
+    float2 uv = vec2(x, y);
+    float3 ro = {RAY_ORIGIN};
+    float3 l = {LOOKAT_POSITION};
+    float3 lo = {LIGHT_ORIGIN}; 
+    float z = ZOOM;
 
-    if (d > MAX_DIST) 
-        return 0.0;
-
-    struct vec3 p = add3(ro, scale3(rd, d));
-    struct vec3 lo = {0, 10, sin(t) * 2}; 
+    float3 rd = ray_dir(uv, ro, l, z); 
     
-    float dif = get_light(p, lo);
-    return pow(dif, .25);
+    float d = raymarch(ro, rd, t);
+
+    if (d > MAX_DIST) { 
+        return -1.0; /* background brightness */
+    }
+
+    float3 p = {ro.x + rd.x * d, ro.y + rd.y * d, ro.z + rd.z * d};
+    float dif = get_light(p, lo, t);
+    return dif;
+}
+
+/*
+ * uv = pixel coordinate normalized
+ * p = ray origin position
+ * l = look at position
+ * z = zoom
+ */
+float3 ray_dir(float2 uv, float3 p, float3 l, float z)
+{
+    float3 f = normalize3(subtract3(l, p));
+    float3 r = normalize3(cross3(vec3(0, -1, 0), f));
+    float3 u = cross3(f, r);
+    float3 c = scale3(f, z);
+    r = scale3(r, uv.x);
+    u = scale3(u, uv.y);
+    float3 rd = {c.x + r.x + u.x, c.y + r.y + u.y, c.z + r.z + u.z};
+    return rd;
 }
 
 /*
  * ro = ray origin
  * rd = ray direction
+ * t = time
  * returns distance from origin to scene along the ray direction 
  */
-float raymarch(struct vec3 ro, struct vec3 rd)
+float raymarch(float3 ro, float3 rd, float t)
 {
     float d_origin = 0.0;
     
     for (int i = 0; i < MAX_STEPS; i++) {
-        struct vec3 p = add3(ro, scale3(rd, d_origin)); 
-        float d_scene = get_distance(p);
+        float3 p = {
+            ro.x + rd.x * d_origin, 
+            ro.y + rd.y * d_origin,
+            ro.z + rd.z * d_origin
+        };
+
+        float d_scene = get_distance(p, t);
         d_origin += d_scene;
 
         if (d_origin > MAX_DIST || fabsf(d_scene) < SURF_DIST)
-            break;
+            return d_origin;
     }
 
-    return d_origin;
+    return MAX_DIST + 1.;
 }
 
 /*
  * p = position in space
- * return the distance from the point in space to the scene
+ * t = time
+ * return the minimum distance from the point in space to the scene
  */
-float get_distance(struct vec3 p)
+float get_distance(float3 p, float t)
 {
-    // float d = torus_SDF(vec3(p.x, p.y - 1.0, p.z - 6.0), vec2(1., 1.));
-    float r = 2.0;
-    float d = length3(p.x, p.y - 1.5, p.z - 6.0) - r;
+    (void)t;
+    p = rotateX(p, t);
+    p = rotateY(p, t * 3.);
+    p = rotateZ(p, t);
+    float d_donut = torus_SDF(p, 2.0, 0.75);
+    float d_cube = cube_SDF(p, 1.0) - 0.5;
+    float d = lerp(d_donut, d_cube, (tanh(t - 10.0) - tanh(t-15.0)) * .5);
     return d;
 }
 
@@ -148,15 +201,17 @@ float get_distance(struct vec3 p)
  * cp = contact surface position
  * return the normal vector of the surface at or very near position p
  */
-struct vec3 get_normal(struct vec3 cp)
+float3 get_normal(float3 cp, float t)
 {
-    float d = get_distance(cp);
+    float d = get_distance(cp, t);
+    
+    /* using calculus approximation */
     float e = 0.01;
-    struct vec3 n = vec3(
-        d - get_distance(vec3(cp.x - e, cp.y, cp.z)),
-        d - get_distance(vec3(cp.x, cp.y - e, cp.z)),
-        d - get_distance(vec3(cp.x, cp.y, cp.z - e))
-    );
+    float3 n = {
+        d - get_distance(vec3(cp.x - e, cp.y, cp.z), t),
+        d - get_distance(vec3(cp.x, cp.y - e, cp.z), t),
+        d - get_distance(vec3(cp.x, cp.y, cp.z - e), t)
+    };
 
     return normalize3(n);
 }
@@ -168,21 +223,41 @@ struct vec3 get_normal(struct vec3 cp)
  * cn = contact surface normal
  * return the brightness of the position on the surface
  */
-float get_light(struct vec3 cp, struct vec3 lo)
+float get_light(float3 cp, float3 lo, float t)
 {
-    struct vec3 ld = normalize3(subtract3(lo, cp));
-    struct vec3 cn = get_normal(cp); 
-    float dif = clamp(dot3(cn, ld), 0.01, 1.0);
+    /* get direction from light source to contact point */
+    float3 ld = {lo.x - cp.x, lo.y - cp.y, lo.z - cp.z};
+    ld = normalize3(ld);
+
+    /* get normal of surface */ 
+    float3 cn = get_normal(cp, t); 
+    
+    /* use to simulate reflections from floor */
+    float down_angle = -cn.y * .5 + .5; 
+    float reflected_brightness = fmax(down_angle * 0.4, 0.02); 
+
+    /* measure closeness between surface normal and light source */
+    float dif = clamp(dot3(ld, cn), reflected_brightness, 1.0);
     return dif;
 }
 
 /*
  * p = position in space
- * t = inner radius, outer radius
+ * r1 = outer radius
+ * r2 = inner radius
+ * t = time
  * returns positive distance to the shape surface, negative if inside
  */
-float torus_SDF(struct vec3 p, struct vec2 t)
+float torus_SDF(float3 p, float r1, float r2)
 {
-    struct vec2 q = vec2(length2(p.x, p.z) - t.x, p.y);
-    return length2(q.x, q.y) - t.y;
+    /* math magic -- source: inigo quilez */
+    return length2(length2(p.x, p.z) - r1, p.y) - r2;
+}
+
+float cube_SDF(float3 p, float r)
+{
+    float3 q = {fabsf(p.x) - r, fabsf(p.y) - r, fabsf(p.z) - r};
+    float3 m = {fmaxf(q.x, 0.0), fmaxf(q.y, 0.0), fmaxf(q.z, 0.0)};
+    float n = fminf(fmaxf(fmaxf(q.x, q.y), q.z), 0.0);
+    return length3(m.x, m.y, m.z) + n;
 }
