@@ -19,6 +19,9 @@
 #define LOOKAT_POSITION 0, 0, 0
 #define ZOOM 1.0
 
+char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
+float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+
 /* shapes */
 float cube_SDF(float3 p, float r);
 float torus_SDF(float3 p, float r1, float r2);
@@ -52,58 +55,56 @@ int main()
         draw_scene(w, h, time_elapsed);
         refresh();  /* output to screen */
         frames++;
-    } while (time_elapsed < MAX_TIME);    
+} while (time_elapsed < MAX_TIME);    
 
-    endwin();       /* return to command line */
-    printf("Animation complete\nFramerate %.0f fps\n", frames / time_elapsed);
-    return 0;
+endwin();       /* return to command line */
+printf("Animation complete\nFramerate %.0f fps\n", frames / time_elapsed);
+return 0;
 }
 
 /*
- * w = width in pixels
- * h = height in pixels
- * t = time in seconds (floating point value)
- */
+* w = width in pixels
+* h = height in pixels
+* t = time in seconds (floating point value)
+*/
 void draw_scene(int w, int h, float t)
 {
-    float aspect_ratio = (float)w / ((float)h * WINDOW_STRETCH_FACTOR);
-    for (int i = 0; i < w; i++) {
-        for (int j = 0; j < h; j++) {
-            /* i / w, j / h -> normalized to range (-0.5, 0.5) */
-            float x = (float)i / (float)w - 0.5;
-            float y = (float)j / (float)h - 0.5;
-    
-            /* correct for aspect ratio */
-            x *= aspect_ratio;
+float aspect_ratio = (float)w / ((float)h * WINDOW_STRETCH_FACTOR);
+for (int i = 0; i < w; i++) {
+    for (int j = 0; j < h; j++) {
+        /* i / w, j / h -> normalized to range (-0.5, 0.5) */
+        float x = (float)i / (float)w - 0.5;
+        float y = (float)j / (float)h - 0.5;
 
-            /* get scene brightness */
-            float b = coordinate_to_brightness(x, y, t);
+        /* correct for aspect ratio */
+        x *= aspect_ratio;
 
-            /* get character to render at pixel */
-            char a = brightness_to_ascii(b);
-            
-            /* draw to screen */
-            move(j, i);
-            addch(a);
-        }
+        /* get scene brightness */
+        float b = coordinate_to_brightness(x, y, t);
+
+        /* get character to render at pixel */
+        char a = brightness_to_ascii(b);
+        
+        /* draw to screen */
+        move(j, i);
+        addch(a);
     }
+}
 }
 
 /*
- * b = brightness value
- * returns corresponding character
- */
+* b = brightness value
+* returns corresponding character
+*/
 char brightness_to_ascii(float b)
 {
-    char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
-    float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-    int n_levels = sizeof(colors) / sizeof(*colors); 
-    
-    if (b > levels[n_levels - 1])
-        return colors[n_levels - 1];
+int n_levels = sizeof(colors) / sizeof(*colors); 
 
-    int i = 0;
-    while (b > levels[i] && i < n_levels)
+if (b > levels[n_levels - 1])
+    return colors[n_levels - 1];
+
+int i = 0;
+while (b > levels[i] && i < n_levels)
         i++;
 
     return colors[i]; 
