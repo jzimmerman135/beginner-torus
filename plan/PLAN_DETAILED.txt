@@ -91,18 +91,11 @@ Implement get_light (10 minutes)
     -- first with no reflected brightness from ground
 
     draw a sphere
-    float3 ld = {lo.x - cp.x, lo.y - cp.y, lo.z - cp.z};
-    ld = normalize3(ld);
-    /* get normal of surface */ 
-    float3 cn = get_normal(cp, t); 
-    
-    /* use to simulate reflections from floor */
-    float down_angle = -cn.y * .5 + .5; 
+    ld = normalize(lo - p);
+    n = get_normal(p, t); 
+    float down_angle = -n.y * .5 + .5; 
     float reflected_brightness = fmax(down_angle * 0.4, 0.02); 
-
-
-    /* measure closeness between surface normal and light source */
-    float dif = clamp(dot3(ld, cn), reflected_brightness, 1.0);
+    float dif = clamp(dot3(ld, n), reflected_brightness, 1.0);
     return dif;
 
 Add movement! (30 minutes)
