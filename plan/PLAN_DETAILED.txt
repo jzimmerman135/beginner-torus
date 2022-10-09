@@ -10,12 +10,14 @@ Implement brightness_to_ascii (10 minutes)
 
 Implement draw_scene and dummy coordinate to brightness (10 minutes)
 -- use curses
-        initscr();
-        curs_set(0);
-        move(h, w);
-        addch(c);
-        refresh();
-        endwin();
+        initscr()
+        curs_set(0)
+        move(h, w)
+        b = coordinate_to_brightness(x, y)
+        c = brightness_to_ascii(b)
+        addch(c)
+        refresh()
+        endwin()
 
 -- draw a variety of brightnesses to the entire screen (10 minutes)
         #define MAX_WINDOW_W and MAX_WINDOW_H
@@ -77,20 +79,19 @@ Implement Raymarching loop (15 minutes)
 
 
 Implement get_normal (5 minutes)
-    float d = get_distance(cp, t);
+    float d = get_distance(p, t);
     /* using calculus approximation */
     float e = 0.01;
     float3 n = {
-        d - get_distance(vec3(cp.x - e, cp.y, cp.z), t),
-        d - get_distance(vec3(cp.x, cp.y - e, cp.z), t),
-        d - get_distance(vec3(cp.x, cp.y, cp.z - e), t)
+        d - get_distance(vec3(p.x - e, p.y, p.z), t),
+        d - get_distance(vec3(p.x, p.y - e, p.z), t),
+        d - get_distance(vec3(p.x, p.y, p.z - e), t)
     };
     return normalize3(n);
 
 Implement get_light (10 minutes)
     -- first with no reflected brightness from ground
-
-    draw a sphere
+    -- draw a sphere
     ld = normalize(lo - p);
     n = get_normal(p, t); 
     float down_angle = -n.y * .5 + .5; 
@@ -100,6 +101,7 @@ Implement get_light (10 minutes)
 
 Add movement! (30 minutes)
     -- explain how we can trick the distance estimator
+    
     -- bust out the desmos tanh and sin/cos
     -- move the shapes
     -- move the light source

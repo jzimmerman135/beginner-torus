@@ -9,8 +9,6 @@ char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
 float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 const int N_LEVELS = sizeof(levels) / sizeof(*levels);
 
-#define MY_MACRO 200
-
 /* program settings macros */
 // TODO
 
@@ -32,16 +30,18 @@ float cube_SDF(float3 p, float r);
 float torus_SDF(float3 p, float r1, float r2);
 float sphere_SDF(float3 p, float r);
 
+#define MY_MACRO 200
+
 int main()
 {
     char chosen_character = colors[5];
 
     printf("Hello workshop! This is how to print to the screen in C\n");
 
-    printf("This is how you can print a character: %c\n", chosen_character);
+    printf("This prints a character: %c\n", chosen_character);
     printf("This also works: %c %c\n", 'd', colors[6]);
 
-    printf("This is to print a float, a.k.a. number w/ decimals: %f\n", 0.5);
+    printf("This prints a float, a.k.a. number w/ decimals: %f\n", 0.5);
     printf("This prints an integer: %i\n", N_LEVELS);
     printf("This value was copy-pasted by a macro: %i\n", MY_MACRO);
 
