@@ -3,7 +3,7 @@
 ### in pure C!
 
 A version of the final output can be found in the `final` directory but due
-to some naming conflicts copy and pasting won't work
+to some (intentional) naming conflicts copy and pasting won't just work
 
 
 The lesson plan and pseudocode can be found in the `plan` directory

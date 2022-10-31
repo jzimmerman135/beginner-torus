@@ -8,11 +8,11 @@ Implement brightness_to_ascii (10 minutes)
             i++;
         return colors[i];
 
-Implement draw_scene and dummy coordinate to brightness (10 minutes)
+Implement curses print and dummy coordinate to brightness (10 minutes)
 -- use curses
         initscr()
         curs_set(0)
-        move(h, w)
+        move(h, w) // remember height first
         b = coordinate_to_brightness(x, y)
         c = brightness_to_ascii(b)
         addch(c)
