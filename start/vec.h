@@ -27,9 +27,9 @@ struct vec2 {
     float y;
 };
 
-/* new struct vec2 */
-struct vec2 vec2(float x, float y);
-struct vec2 scale2(struct vec2 a, float s);
+/* new float2 */
+float2 vec2(float x, float y);
+float2 scale2(float2 a, float s);
 
 struct vec3 {
     float x;
@@ -37,30 +37,30 @@ struct vec3 {
     float z;
 };
 
-/* new struct vec3 */
-struct vec3 vec3(float x, float y, float z);
+/* new float3 */
+float3 vec3(float x, float y, float z);
 
 /* a / length3(a) */
-struct vec3 normalize3(struct vec3 a);
+float3 normalize3(float3 a);
 
 /* a * s */
-struct vec3 scale3(struct vec3 a, float s);
+float3 scale3(float3 a, float s);
 
 /* a + b */
-struct vec3 add3(struct vec3 a, struct vec3 b);
+float3 add3(float3 a, float3 b);
 
 /* a - b */
-struct vec3 subtract3(struct vec3 a, struct vec3 b);
+float3 subtract3(float3 a, float3 b);
 
 /* dot product */
-float dot3(struct vec3 a, struct vec3 b);
+float dot3(float3 a, float3 b);
 
 /* orthogonal of a and b */
-struct vec3 cross3(struct vec3 a, struct vec3 b);
+float3 cross3(float3 a, float3 b);
 
-/* rotate struct vec3 around axis by t radians */
-struct vec3 rotateX(struct vec3 a, float t);
-struct vec3 rotateY(struct vec3 a, float t);
-struct vec3 rotateZ(struct vec3 a, float t);
+/* rotate float3 around axis by t radians */
+float3 rotateX(float3 a, float t);
+float3 rotateY(float3 a, float t);
+float3 rotateZ(float3 a, float t);
 
 #endif

@@ -13,7 +13,7 @@ target: main mini
 main: main.o vec.o 
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) 
 
-mini: mini.o vec.o 
+mini: mini.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS) 
 
 clean:

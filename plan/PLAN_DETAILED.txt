@@ -30,7 +30,7 @@ Implement draw_scene and dummy coordinate to brightness (10 minutes)
                 addch()
 
 -- draw a circle (10 minutes)
-        length2f(xy) > r;
+        length2f(xy) < r;
 
 Implement main timer loop (10 minutes)
 -- make the circle change size

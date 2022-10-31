@@ -10,22 +10,17 @@ float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 const int N_LEVELS = sizeof(levels) / sizeof(*levels);
 
 /* program settings macros */
-// TODO
 
 /* rendering performance macros */
-// TODO
 
 /* camera setting macros */
-// TODO
 
 /* rendering functions */
-// TODO
 float3 ray_direction(float2 uv, float3 p, float3 l, float z);
 
 /* drawing functions */
-// TODO
 
-/* shapes */
+/* shape functions */
 float cube_SDF(float3 p, float r);
 float torus_SDF(float3 p, float r1, float r2);
 float sphere_SDF(float3 p, float r);
@@ -35,29 +30,14 @@ float sphere_SDF(float3 p, float r);
 int main()
 {
     char chosen_character = colors[5];
-
-    printf("Hello workshop! This is how to print to the screen in C\n");
-
     printf("This prints a character: %c\n", chosen_character);
-    printf("This also works: %c %c\n", 'd', colors[6]);
-
-    printf("This prints a float, a.k.a. number w/ decimals: %f\n", 0.5);
-    printf("This prints an integer: %i\n", N_LEVELS);
-    printf("This value was copy-pasted by a macro: %i\n", MY_MACRO);
-
-    /* 
-     * notice fprintf() NOT printf() and first argument stderr
-     * when we have a window open, printf() won't work, so use fprintf(stderr)
-     * during debugging.
-     */
+    printf("So does this: %c\n", MY_MACRO);
     fprintf(stderr, "This line goes to debug.txt if you run \'make debug\'\n");
-
     return 0;
 }
 
-/*****************************************************************************/
-/*                           RENDERING FUNCTIONS                             */
-/*****************************************************************************/
+/* RENDERING FUNCTIONS                                                        */
+/* -------------------                                                        */
 
 /*
  * uv = pixel coordinate normalized (-0.5, 0.5)
@@ -78,15 +58,11 @@ float3 ray_direction(float2 uv, float3 p, float3 l, float z)
     return rd;
 }
 
-/*****************************************************************************/
-/*                            DRAWING FUNCTIONS                              */
-/*****************************************************************************/
+/* DRAWING FUNCTIONS                                                          */
+/* -----------------                                                          */
 
-/*****************************************************************************/
-/*                     3D SHAPE SIGNED DISTANCE FIELDS                       */
-/*                    math magic -- source: inigo quilez                     */
-/*****************************************************************************/
-
+/* 3D SHAPE SIGNED DISTANCE FIELD FUNCTIONS                                   */
+/* ----------------------------------------                                   */
 /*
  * p = current position
  * r1 = outer radius
