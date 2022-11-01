@@ -230,11 +230,11 @@ float get_light(float3 cp, float3 lo, float t)
     float3 cn = get_normal(cp, t); 
     
     /* use to simulate reflections from floor */
-    float down_angle = -cn.y * .5 + .5; 
-    float reflected_brightness = fmax(down_angle * 0.4, 0.02); 
+    // float down_angle = -cn.y * .5 + .5; 
+    // float reflected_brightness = fmax(down_angle * 0.4, 0.02); 
 
     /* measure closeness between surface normal and light source */
-    float dif = clamp(dot3(ld, cn), reflected_brightness, 1.0);
+    float dif = clamp(dot3(ld, cn), 0.0001, 1.0);
     return dif;
 }
 
