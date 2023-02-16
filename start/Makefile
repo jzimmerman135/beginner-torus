@@ -17,5 +17,4 @@ clean:
 	rm -rf *.o main debug.txt
 
 debug: 
-	@make &> /dev/null
 	@./main 2> debug.txt

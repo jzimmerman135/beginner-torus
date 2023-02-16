@@ -1,5 +1,6 @@
 #ifndef VEC_INCLUDED
 #define VEC_INCLUDED
+
 #ifndef min
 #define min(a, b) (a > b ? b : a)
 #endif
@@ -7,35 +8,35 @@
 #define max(a, b) (a > b ? a : b)
 #endif
 
-/* return a from range [b, c] */
-float clampf(float a, float b, float c);
+/* clamp argument a to the within the range [b, c] */
+float clamp(float a, float b, float c);
 
 /* linear interpolate between a, b based on t in [0, 1] */
-float lerpf(float a, float b, float t);
+float lerp(float a, float b, float t);
 
 /* 2D euclidean distance, sqrt(x^2 + y^2) */
-float length2f(float x, float y);
+float length2(float x, float y);
 
 /* 3D euclidean distance, sqrt(x^2 + y^2 + z^2) */
-float length3f(float x, float y, float z);
+float length3(float x, float y, float z);
 
 typedef struct vec3 float3;
 typedef struct vec2 float2;
 
-struct vec2 {
+typedef struct {
     float x;
     float y;
-};
+} float2;
 
 /* new float2 */
 float2 vec2(float x, float y);
 float2 scale2(float2 a, float s);
 
-struct vec3 {
+typedef struct {
     float x;
     float y;
     float z;
-};
+} float3;
 
 /* new float3 */
 float3 vec3(float x, float y, float z);

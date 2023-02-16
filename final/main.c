@@ -56,7 +56,7 @@ int main()
         draw_scene(w, h, time_elapsed);
         refresh();  /* output to screen */
         frames++;
-} while (time_elapsed < MAX_TIME);    
+    } while (time_elapsed < MAX_TIME);    
 
     endwin();       /* return to command line */
     printf("Animation complete\nFramerate %.0f fps\n", frames / time_elapsed);
