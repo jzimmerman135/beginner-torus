@@ -1,10 +1,15 @@
 Order of operations:
 --------------------
 
+draw on whiteboard vector subtraction, vector normalization and ray direction
+and distance estimator
+
+pull up desmos with some basic stuff
+
 Implement brightness_to_ascii (10 minutes)
 -- printf a variety of results
         int i = 0;
-        while (b < levels[i] && i < N_LEVELS)
+        while (b > levels[i] && i < N_LEVELS)
             i++;
         return colors[i];
 
@@ -21,22 +26,40 @@ Implement curses print and dummy coordinate to brightness (10 minutes)
 
 -- draw a variety of brightnesses to the entire screen (10 minutes)
         #define MAX_WINDOW_W and MAX_WINDOW_H
-        for ()
-            for ()
-                float x = (float)i / (float)w - 0.5;
-                float y = (float)j / (float)h - 0.5;
+        float aspect_ratio = (float)w / (float)h;
+        for (i in COLS -- width)
+            for (j in LINES -- height)
+                float x = 2.0 * (float)i / (float)w - 1.0;
+                float y = 2.0 * (float)j / (float)h - 1.0;
                 coordinate_to_brightness();
-                move()
+                move(j, i)
                 addch()
 
--- draw a circle (10 minutes)
-        length2f(xy) < r;
+-- draw a circle and fix aspect ratio (10 minutes)
+    coordinate_to_brightness {
+        if length2f(xy) < r;
+            0.5;
+        0.0
+    }
+
+    x *= aspect_ratio / WINDOW_STRETCH_FACTOR;
+
+-- at this point main should look like this
+int main()
+{
+    initscr();
+    curs_set(0);
+    draw_scene(COLS, LINES);
+    getch();
+    endwin();
+    return 0;
+}
 
 Implement main timer loop (10 minutes)
 -- make the circle change size
         clock_t time_start = clock()
         float time_elapsed = 0.0;
-        frames = 0;
+        int frames = 0;
         do {
             time_elapsed = (float)(clock() - time_start) / CLOCKS_PER_SEC;
             draw_scene
@@ -45,6 +68,10 @@ Implement main timer loop (10 minutes)
         } while (time_elapsed < MAX_TIME)
         endwin();
         printf("Framerate %.0f fps\n", frames / time_elapsed);
+    
+-- add time to our circle and desmos sin(x) * 0.5 + 0.5
+    coordinate_to_brightness():
+        if (length2(x, y) > sin(time) * 0.25 + 0.5)
 
 Explain raymarching algorithm (10 minutes)
 -- what is seeing? what is light?
@@ -60,23 +87,33 @@ Explain raymarching algorithm (10 minutes)
 
 Implement Distance Estimator (10 minutes)
 -- explain signed distance field
+    length3(p.x, p.y, p.z) - r;
 -- basically give function
+    (void)time;
+    float distance = MAX_DIST;
+    distance = fminf(distance, sphere_SDF({0, 0, 1}, 0.5));
+    return distance;
 -- add time as a parameter!!!
 
 Implement Raymarching loop (15 minutes)
 -- draw sphere distance field
-
-    float d_origin
+    float d_origin = 0.0
     for (i < MAX_STEPS)
         p = ro + rd * d;
         ds = get_dist(p);
         d += ds;
-        if (d > MAX_DIST)
+        if (d >= MAX_DIST)
             return d
         if (abs(ds) < SURF_DIST)
             return d
     return d
 
+Perform intersections
+NOTE GOOD STARTING POINTS
+RAY_ORIGIN 0, 2, -6
+LOOKAT_PT 0, 0, 0
+LIGHT_ORIGIN 4, 10, 0
+SPHERE_RADIUS 4.0
 
 Implement get_normal (5 minutes)
     float d = get_distance(p, t);
@@ -101,8 +138,17 @@ Implement get_light (10 minutes)
 
 Add movement! (30 minutes)
     -- explain how we can trick the distance estimator
-    
     -- bust out the desmos tanh and sin/cos
     -- move the shapes
     -- move the light source
     -- rotateX
+
+some tricks
+    get_distance() in original demo
+        p = rotateX(p, t);
+        p = rotateY(p, t * 3.);
+        p = rotateZ(p, t);
+        float d_donut = torus_SDF(p, 2.0, 0.75);
+        float d_cube = cube_SDF(p, 1.25) - 0.25;
+        float d = lerp(d_donut, d_cube, (tanh(t - 10.0) - tanh(t-15.0)) * .5);
+        return d;

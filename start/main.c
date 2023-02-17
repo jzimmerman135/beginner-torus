@@ -7,6 +7,7 @@
 
 /* brightness < 0 corresponds to the background using the '`' character */
 char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
+char  dark_mode[] = {'_', ' ', '.', '-', ':', '=', '+', '*', '#', '%', '@'};
 float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
 /* N_LEVELS adapts automatically if you add more levels */
