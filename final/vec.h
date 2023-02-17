@@ -4,12 +4,11 @@
 #ifndef min
 #define min(a, b) (a > b ? b : a)
 #endif
-
 #ifndef max
 #define max(a, b) (a > b ? a : b)
 #endif
 
-/* return a from range [b, c] */
+/* clamp argument a to the within the range [b, c] */
 float clamp(float a, float b, float c);
 
 /* linear interpolate between a, b based on t in [0, 1] */
@@ -21,47 +20,46 @@ float length2(float x, float y);
 /* 3D euclidean distance, sqrt(x^2 + y^2 + z^2) */
 float length3(float x, float y, float z);
 
-typedef struct vec3 float3;
-typedef struct vec2 float2;
-
-struct vec2 {
+typedef struct {
     float x;
     float y;
-};
+} float2;
 
-/* new struct vec2 */
-struct vec2 vec2(float x, float y);
+/* new float2 */
+float2 f2new(float x, float y);
+float2 scale2(float2 a, float s);
+float2 add2(float2 a, float2 b);
 
-struct vec3 {
+typedef struct {
     float x;
     float y;
     float z;
-};
+} float3;
 
-/* new struct vec3 */
-struct vec3 vec3(float x, float y, float z);
+/* new float3 */
+float3 f3new(float x, float y, float z);
 
 /* a / length3(a) */
-struct vec3 normalize3(struct vec3 a);
+float3 normalize3(float3 a);
 
 /* a * s */
-struct vec3 scale3(struct vec3 a, float s);
+float3 scale3(float3 a, float s);
 
 /* a + b */
-struct vec3 add3(struct vec3 a, struct vec3 b);
+float3 add3(float3 a, float3 b);
 
 /* a - b */
-struct vec3 subtract3(struct vec3 a, struct vec3 b);
+float3 subtract3(float3 a, float3 b);
 
 /* dot product */
-float dot3(struct vec3 a, struct vec3 b);
+float dot3(float3 a, float3 b);
 
 /* orthogonal of a and b */
-struct vec3 cross3(struct vec3 a, struct vec3 b);
+float3 cross3(float3 a, float3 b);
 
-/* rotate struct vec3 around axis by t radians */
-struct vec3 rotateX(float3 a, float t);
-struct vec3 rotateY(float3 a, float t);
-struct vec3 rotateZ(float3 a, float t);
+/* rotate float3 around axis by t radians */
+float3 rotateX(float3 a, float t);
+float3 rotateY(float3 a, float t);
+float3 rotateZ(float3 a, float t);
 
 #endif
