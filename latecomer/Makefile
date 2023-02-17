@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS := -Wall -Werror -Wextra -Ofast
 LDFLAGS :=
-LDLIBS := -lncurses
+LDLIBS := -lncurses -lm
 OBJECTS := vec.o
 
 target: main

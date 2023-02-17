@@ -1,3 +1,6 @@
 *.o
 .vscode/*
 final_old
+final/main
+latecomer/main
+start/main
