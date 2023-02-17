@@ -109,7 +109,7 @@ void draw_scene(int width, int height, float time) {
             x *= aspect_ratio / WINDOW_STRETCH_FACTOR;
             y *= -1.0;
             float brightness = coordinate_to_brightness(x, y, time);
-            float ascii_pixel = brightness_to_ascii(brightness);
+            char ascii_pixel = brightness_to_ascii(brightness);
             addch(ascii_pixel);
         }
     }
