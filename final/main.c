@@ -4,9 +4,11 @@
 #include <time.h>
 #include <math.h>
 #include "vec.h"
+#include "helpers.h"
 
 /* brightness < 0 corresponds to the background using the '`' character */
 char  colors[] = {'`', '@', '%', '#', '*', '+', '=', ':', '-', '.', ' '};
+char  dark_mode[] = {'_', ' ', '.', '-', ':', '=', '+', '*', '#', '%', '@'};
 float levels[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
 /* N_LEVELS adapts automatically if you add more levels */
@@ -34,7 +36,6 @@ float sphere_SDF(float3 p, float r);
 
 /* rendering functions */
 float get_distance(float3 position, float time) {
-    (void)time;
     position.y += sin(time) * 0.5 - 0.5;
     float distance = sphere_SDF(position, 2.0);
     return distance;
@@ -106,6 +107,7 @@ void draw_scene(int width, int height, float time) {
             float x = 2.0f * (float)i / (float)width - 1.0f;
             float y = 2.0f * (float)j / (float)height - 1.0f;
             x *= aspect_ratio / WINDOW_STRETCH_FACTOR;
+            y *= -1.0;
             float brightness = coordinate_to_brightness(x, y, time);
             float ascii_pixel = brightness_to_ascii(brightness);
             addch(ascii_pixel);
@@ -119,46 +121,19 @@ int main()
 {
     initscr();
     curs_set(0);
+
     clock_t time_start = clock();
     float time_elapsed = 0.0;
     int frames = 0;
     do {
         time_elapsed = (float)(clock() - time_start) / CLOCKS_PER_SEC;
-        draw_scene(COLS, LINES, time_elapsed);
+        int width = min(COLS, MAX_WINDOW_W);
+        int height = min(LINES, MAX_WINDOW_H);
+        draw_scene(width, height, time_elapsed);
         refresh();
         frames++;
     } while (time_elapsed < MAX_TIME);
     endwin();
     printf("Framerate %.0f fps\n", frames / time_elapsed);
     return 0;
-}
-
-/* RENDERING FUNCTIONS */
-/* ------------------- */
-float3 get_ray_direction(float2 uv, float3 p, float3 l, float z)
-{
-    (void)l;
-    float3 f = normalize3(scale3(p, -1.0));
-    float3 r = normalize3(cross3(f3new(0, -1, 0), f));
-    float3 u = cross3(f, r);
-    float3 c = scale3(f, z);
-    r = scale3(r, uv.x / 2.0);
-    u = scale3(u, uv.y / 2.0);
-    float3 rd = {c.x + r.x + u.x, c.y + r.y + u.y, c.z + r.z + u.z};
-    return normalize3(rd);
-}
-
-/* DRAWING FUNCTIONS */
-/* ----------------- */
-
-/* 3D SHAPE SIGNED DISTANCE FIELD FUNCTIONS */
-/* ---------------------------------------- */
-/*
- * p = current position
- * r = radius
- * returns distance to the sphere
- */
-float sphere_SDF(float3 p, float r)
-{
-    return length3(p.x, p.y, p.z) - r;
 }
