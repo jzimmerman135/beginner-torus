@@ -58,8 +58,8 @@ float dot3(float3 a, float3 b);
 float3 cross3(float3 a, float3 b);
 
 /* rotate float3 around axis by t radians */
-float3 rotateX(float3 a, float t);
-float3 rotateY(float3 a, float t);
-float3 rotateZ(float3 a, float t);
+float3 rotate3X(float3 a, float t);
+float3 rotate3Y(float3 a, float t);
+float3 rotate3Z(float3 a, float t);
 
 #endif

@@ -31,7 +31,8 @@ const int N_LEVELS = sizeof(levels) / sizeof(*levels);
 
 /* drawing functions */
 float coordinate_to_brightness(float x, float y, float time) {
-    if (length2(x, y) < sin(time) * 0.25 + 0.5) {
+    float radius = sin(time) * 0.25 + 0.5;
+    if (length2(x, y) < radius) {
         return 0.3;
     }
     return -1.0;
