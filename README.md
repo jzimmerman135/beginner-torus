@@ -3,17 +3,19 @@
 ### in pure C!
 
 A version of the final output can be found in the `final` directory but due
-to some (intentional) naming conflicts copy and pasting won't just work
+to some (intentional) naming conflicts copy and pasting won't work
 
+The lesson plan and pseudocode can be found in the `plan` directory, good for both instructors and attendees
 
-The lesson plan and pseudocode can be found in the `plan` directory
+Begin with the `start` directory for starter code.
 
-Begin with the `start` directory for starter code. 
+If you want the ncurses window setup already start from `latecomer` directory
 
-If you want the curses window setup already start from `latecomer` directory
+See vec.h for some easy vector math functions.
 
-See vec.h for some easy vector handling functions.
+Could use C++ if desired.
 
-Could use C++ if desired
+## WINDOWS
+Ensure that attendees can get a demo ncurses program on WSL *before* workshop begins!
 
 ![Alt Text](demo.gif)
